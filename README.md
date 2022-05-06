@@ -69,7 +69,7 @@ If some API error occurs,
 Register at  https://newsapi.org/account to get an API KEY and replace API KEY at lib -> util -> app_constants -> API_KEY
 
 ```
-##Checkout working demo from here
+## Checkout working demo from here
 
 ```
 https://drive.google.com/drive/folders/1qP802n5VlFAFah6P8SpJwsK02meUi1ZO?usp=sharing
