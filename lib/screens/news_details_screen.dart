@@ -1,14 +1,17 @@
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/data/model/artical_model.dart';
+import 'package:news_app/providers/auth_provider.dart';
+import 'package:news_app/providers/news_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
 import 'package:news_app/util/images.dart';
 import 'package:news_app/util/styles.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class NewsDetailsScreen extends StatefulWidget {
-  ArticleModel article;
+  Article article;
   NewsDetailsScreen({Key key, @required this.article}) : super(key: key);
 
   @override
@@ -21,6 +24,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
+    print(widget.article.description);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -30,6 +34,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
               height: 100.h,
               child: Stack(
                 children: [
+                  //Network Image 1 Layer
                   Positioned(
                     left: 0.0,
                     right: 0.0,
@@ -38,20 +43,22 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                       child: FadeInImage.assetNetwork(
                           placeholder: Images.placeholder,
                           fit: BoxFit.cover,
-                          image: widget.article.urlToImage ?? "",
+                          image: widget.article.urlToImage,
                           imageErrorBuilder: (c, o, s) => Image.asset(
                                 Images.placeholder,
                                 fit: BoxFit.cover,
                               )),
                     ),
                   ),
+                  //White background 2 layer
                   Positioned(
                     left: 0,
                     right: 0,
-                    top: 40.h,
+                    top: 39.h,
                     child: Container(
                         height: 65.h,
                         decoration: const BoxDecoration(
+                          color: Colors.white,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(15.0),
                             topRight: Radius.circular(15.0),
@@ -67,6 +74,8 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                           ),
                         )),
                   ),
+
+                  //Grey topic 3 layer
                   Positioned(
                     top: 31.h,
                     left: 9.w,
@@ -109,6 +118,8 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                           ],
                         )),
                   ),
+
+                  //Favourite button 4 layer
                   Positioned(
                     top: 50,
                     left: 5,
@@ -133,7 +144,17 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                   Positioned(
                     bottom: 30,
                     right: 30,
-                    child: FavoriteButton(isFavorite: false, iconColor: ColorResources.COLOR_PRIMARY_RED, valueChanged: (_isFavorite) {}),
+                    child: FavoriteButton(
+                      isFavorite: Provider.of<NewsProvider>(context, listen: false).isFavourite(widget.article),
+                      iconColor: ColorResources.COLOR_PRIMARY_RED,
+                      valueChanged: (_isFavorite) {
+                        Provider.of<NewsProvider>(context, listen: false).addOrRemoveFromFavourite(
+                          _isFavorite,
+                          widget.article,
+                          Provider.of<AuthProvider>(context, listen: false).user,
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:news_app/data/model/artical_model.dart';
 import 'package:news_app/data/model/response/base/api_response.dart';
 import 'package:news_app/data/model/response/news_response.dart';
+import 'package:news_app/data/model/user_model.dart';
 import 'package:news_app/data/repository/news_repo.dart';
+import 'package:news_app/helper/db_helper.dart';
 
 class NewsProvider with ChangeNotifier {
   final NewsRepo newsRepo;
@@ -17,12 +21,14 @@ class NewsProvider with ChangeNotifier {
   int get currentPage => _currentPage;
   String get selectedCategory => _selectedCategory;
 
-  List<ArticleModel> _latestNewsList = [];
-  List<ArticleModel> get latestNewsList => _latestNewsList;
-  List<ArticleModel> _categoryNewsList = [];
-  List<ArticleModel> get categoryNewsList => _categoryNewsList;
-  List<ArticleModel> _allNewsList = [];
-  List<ArticleModel> get allNewsList => _allNewsList;
+  List<Article> _latestNewsList = [];
+  List<Article> get latestNewsList => _latestNewsList;
+  List<Article> _categoryNewsList = [];
+  List<Article> get categoryNewsList => _categoryNewsList;
+  List<Article> _allNewsList = [];
+  List<Article> get allNewsList => _allNewsList;
+  List<Article> _favouriteArtilse = [];
+  List<Article> get favouriteArtilse => _favouriteArtilse;
 
   // loading
   bool _isLoadingLatestNews = true;
@@ -132,9 +138,42 @@ class NewsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateFavouriteArticles(String articles) {
+    var objsJson = jsonDecode(articles) as List;
+    _favouriteArtilse = objsJson.map((tagJson) => Article.fromJson(tagJson)).toList();
+    notifyListeners();
+  }
+
   Future<void> setNextPage(int i) async {
     _currentPage = i;
     await getAllNews();
     notifyListeners();
+  }
+
+  Future<void> addOrRemoveFromFavourite(isFavorite, article, User user) async {
+    if (isFavorite) {
+      _favouriteArtilse.add(article);
+    } else {
+      _favouriteArtilse.removeWhere(
+        (element) => element.title == element.title && element.publishedAt == article.publishedAt,
+      );
+    }
+    User userUpdate = User(
+      username: user.username,
+      password: user.password,
+      email: user.email,
+      id: user.id,
+      isLoggedIn: false,
+      listOfArticles: jsonEncode(_favouriteArtilse),
+    );
+    await DatabaseHelper.instance.update(userUpdate);
+    notifyListeners();
+  }
+
+  bool isFavourite(article) {
+    var contain = _favouriteArtilse.where(
+      (element) => element.title == element.title && element.publishedAt == article.publishedAt,
+    );
+    return contain.length > 0 ? true : false;
   }
 }

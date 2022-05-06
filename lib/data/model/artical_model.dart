@@ -1,4 +1,6 @@
-class ArticleModel {
+import 'package:news_app/util/util.dart';
+
+class Article {
   Source source;
   String author;
   String title;
@@ -8,17 +10,18 @@ class ArticleModel {
   String publishedAt;
   String content;
 
-  ArticleModel({this.source, this.author, this.title, this.description, this.url, this.urlToImage, this.publishedAt, this.content});
+  Article({this.source, this.author, this.title, this.description, this.url, this.urlToImage, this.publishedAt, this.content});
 
-  ArticleModel.fromJson(Map<String, dynamic> json) {
+  Article.fromJson(Map<String, dynamic> json) {
     source = json['source'] != null ? new Source.fromJson(json['source']) : null;
     author = json['author'];
     title = json['title'];
     description = json['description'];
     url = json['url'];
-    urlToImage = json['urlToImage'];
+    urlToImage = Util.getImageURL(json['urlToImage']);
     publishedAt = json['publishedAt'];
     content = json['content'];
+    print(urlToImage);
   }
 
   Map<String, dynamic> toJson() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:news_app/data/widgets/custom_text_field.dart';
+import 'package:news_app/helper/email_checker.dart';
 import 'package:news_app/helper/route_helper.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/screens/signup_screen.dart';
@@ -8,6 +9,7 @@ import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
 import 'package:news_app/util/images.dart';
 import 'package:news_app/util/styles.dart';
+import 'package:news_app/util/util.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -93,24 +95,23 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: height * 0.25),
                 InkWell(
                   onTap: () {
-                    Navigator.pushNamedAndRemoveUntil(context, "/Main", (route) => false);
-                    // String _email = _emailController.text.trim();
-                    // String _password = _passwordController.text.trim();
-                    // if (_email.isEmpty) {
-                    //   showBotToast("Enter email", context);
-                    // } else if (_password.isEmpty) {
-                    //   showBotToast("Enter password", context);
-                    // } else if (EmailChecker.isNotValid(_email)) {
-                    //   showBotToast("Enter vaid email", context);
-                    // } else {
-                    //   authProvider.login(_email, _password).then((status) async {
-                    //     if (status.isSuccess) {
-                    //       Navigator.pushNamedAndRemoveUntil(context, "/Home", (route) => false);
-                    //     } else {
-                    //       showBotToast(status.message, context);
-                    //     }
-                    //   });
-                    // }
+                    String _email = _emailController.text.trim();
+                    String _password = _passwordController.text.trim();
+                    if (_email.isEmpty) {
+                      Util.showBotToast("Enter email", context);
+                    } else if (_password.isEmpty) {
+                      Util.showBotToast("Enter password", context);
+                    } else if (EmailChecker.isNotValid(_email)) {
+                      Util.showBotToast("Enter vaid email", context);
+                    } else {
+                      authProvider.login(_email, _password).then((sussess) async {
+                        if (sussess) {
+                          Navigator.pushNamedAndRemoveUntil(context, "/Main", (route) => false);
+                        } else {
+                          Util.showBotToast("Invalid user", context);
+                        }
+                      });
+                    }
                   },
                   child: Container(
                     height: 50.0,
@@ -128,18 +129,10 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 15,
                             ),
                           ),
-                          authProvider.isLoading
-                              ? const SizedBox(
-                                  height: 20.0,
-                                  width: 20.0,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 3.0,
-                                  ))
-                              : const Icon(
-                                  Icons.arrow_right_alt_rounded,
-                                  color: Colors.white,
-                                ),
+                          const Icon(
+                            Icons.arrow_right_alt_rounded,
+                            color: Colors.white,
+                          ),
                         ],
                       ),
                     ),

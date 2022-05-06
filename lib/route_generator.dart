@@ -23,7 +23,7 @@ class RouteGenerator {
       case "/SeeAll":
         return MaterialPageRoute(builder: (context) => const AllNewsScreen());
       case "/ArticleDetails":
-        ArticleModel item = args as ArticleModel;
+        Article item = args as Article;
         return MaterialPageRoute(
             builder: (context) => NewsDetailsScreen(
                   article: item,

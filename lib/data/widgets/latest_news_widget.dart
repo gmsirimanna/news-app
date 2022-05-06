@@ -106,7 +106,7 @@ class _LatestNewsWidgetState extends State<LatestNewsWidget> {
                                       child: FadeInImage.assetNetwork(
                                           placeholder: Images.placeholder,
                                           fit: BoxFit.cover,
-                                          image: newsProvider.latestNewsList[index].urlToImage ?? "",
+                                          image: newsProvider.latestNewsList[index].urlToImage,
                                           imageErrorBuilder: (c, o, s) => Image.asset(
                                                 Images.placeholder,
                                                 fit: BoxFit.cover,

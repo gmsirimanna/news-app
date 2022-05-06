@@ -6,10 +6,12 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:news_app/data/model/artical_model.dart';
 import 'package:news_app/data/widgets/chip_button.dart';
 import 'package:news_app/data/widgets/latest_news_widget.dart';
+import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/providers/news_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
 import 'package:news_app/util/images.dart';
+import 'package:news_app/util/util.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:intl/intl.dart';
@@ -28,9 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      NewsProvider _itemsProvider = Provider.of<NewsProvider>(context, listen: false);
-      _itemsProvider.getLatestNewsList();
-      _itemsProvider.getCategoryArticles();
+      NewsProvider _newsProvider = Provider.of<NewsProvider>(context, listen: false);
+      _newsProvider.updateFavouriteArticles(Provider.of<AuthProvider>(context, listen: false).user.listOfArticles);
+      _newsProvider.getLatestNewsList();
+      _newsProvider.getCategoryArticles();
     });
   }
 
@@ -79,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _buildCategoryNews(List<ArticleModel> _categoryArticles, bool isLoading, String error) {
+  Container _buildCategoryNews(List<Article> _categoryArticles, bool isLoading, String error) {
     return !isLoading && _categoryArticles.isNotEmpty
         ? Container(
             margin: const EdgeInsets.only(right: 15.0, left: 15.0, top: 18),
@@ -112,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: FadeInImage.assetNetwork(
                                     placeholder: Images.placeholder,
                                     fit: BoxFit.cover,
-                                    image: _categoryArticles[currentIndex].urlToImage ?? "",
+                                    image: _categoryArticles[currentIndex].urlToImage,
                                     imageErrorBuilder: (c, o, s) => Image.asset(
                                           Images.placeholder,
                                           fit: BoxFit.cover,

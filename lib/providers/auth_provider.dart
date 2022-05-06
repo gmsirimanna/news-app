@@ -1,83 +1,76 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
-import 'package:news_app/data/model/response/base/api_response.dart';
-import 'package:news_app/data/model/response/login_response.dart';
-import 'package:news_app/data/repository/auth_repo.dart';
-import 'package:news_app/data/repository/response_model.dart';
+import 'package:news_app/data/model/user_model.dart';
+import 'package:news_app/helper/db_helper.dart';
+import 'package:news_app/providers/news_provider.dart';
+import 'package:news_app/util/app_constants.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthRepo authRepo;
+  final SharedPreferences sharedPreferences;
+  AuthProvider({this.sharedPreferences});
 
-  AuthProvider({@required this.authRepo});
+  User _userDetails;
+  User get user => _userDetails;
 
-  // for registration section
+  // loading
   bool _isLoading = false;
-  // List<Property> _tenantPropertyList;
-
   bool get isLoading => _isLoading;
-  String _registrationErrorMessage = '';
-  // List<Property> get tenantPropertyList => _tenantPropertyList;
 
-  String get registrationErrorMessage => _registrationErrorMessage;
+  Future<bool> addUser(String username, String password, String email) async {
+    final user = User(
+      username: username,
+      password: password,
+      email: email,
+      isLoggedIn: false,
+      listOfArticles: "[]",
+    );
 
-  updateRegistrationErrorMessage(String message) {
-    _registrationErrorMessage = message;
-    notifyListeners();
+    try {
+      User userAdded = await DatabaseHelper.instance.create(user);
+      if (userAdded != null) return true;
+      return false;
+    } catch (e) {}
+    return false;
   }
 
-  // for login section
-  String _loginErrorMessage = '';
-
-  String get loginErrorMessage => _loginErrorMessage;
-
-  Future<ResponseModel> login(String email, String password) async {
+  Future<bool> login(String username, String password) async {
     _isLoading = true;
-    _loginErrorMessage = '';
     notifyListeners();
-    ApiResponse apiResponse = await authRepo.login(email: email, password: password);
-    ResponseModel responseModel;
-    if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
-      Map map = apiResponse.response.data;
-      LoginResponse loginResponse = LoginResponse.fromJson(map);
-      authRepo.saveUserToken(loginResponse.accessToken);
-      authRepo.saveUserData(loginResponse.tenant, email, password);
-      responseModel = ResponseModel(true, 'successful');
-    } else {
-      String errorMessage;
-      if (apiResponse.error is String) {
-        errorMessage = apiResponse.error.toString();
-      } else {
-        errorMessage = apiResponse.error.errors[0].message;
+    try {
+      User user = await DatabaseHelper.instance.readUser(username, password);
+      if (user != null) {
+        _userDetails = user;
+        addUserToken(user.id.toString());
+        return true;
       }
-      print(errorMessage);
-      _loginErrorMessage = errorMessage;
-      responseModel = ResponseModel(false, errorMessage);
-    }
+    } catch (e) {}
     _isLoading = false;
     notifyListeners();
-    return responseModel;
+    return false;
   }
 
-  isLoggedIn() {
-    return authRepo.isLoggedIn();
+  saveUser(User user) {
+    _userDetails = user;
+    notifyListeners();
+  }
+
+  // for  user token
+  Future<void> addUserToken(String token) async {
+    try {
+      await sharedPreferences.setString(AppConstants.TOKEN, token);
+    } catch (e) {
+      throw e;
+    }
   }
 
   Future<bool> clearSharedData() async {
-    return await authRepo.clearSharedData();
+    return sharedPreferences.clear();
   }
 
-  String getUserToken() {
-    return authRepo.getUserToken();
-  }
-
-  String getUserName() {
-    return authRepo.getUserName();
-  }
-
-  String getMobile() {
-    return authRepo.getMobile();
-  }
-
-  String getUserImage() {
-    return authRepo.getUserImage();
+  Future<String> isUserLoggedIn() async {
+    return sharedPreferences.getString(AppConstants.TOKEN) ?? "";
   }
 }

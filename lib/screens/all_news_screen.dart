@@ -23,7 +23,7 @@ class AllNewsScreen extends StatefulWidget {
 class _AllNewsScreenState extends State<AllNewsScreen> {
   double height, width;
   static const _pageSize = 20;
-  final PagingController<int, ArticleModel> _pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, Article> _pagingController = PagingController(firstPageKey: 0);
   @override
   void initState() {
     _pagingController.addPageRequestListener((pageKey) {
@@ -95,7 +95,7 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
               // 3
               child: PagedListView.separated(
                 // 4
-                builderDelegate: PagedChildBuilderDelegate<ArticleModel>(
+                builderDelegate: PagedChildBuilderDelegate<Article>(
                   itemBuilder: (context, article, currentIndex) {
                     return GestureDetector(
                       onTap: (() => Navigator.of(context).pushNamed(

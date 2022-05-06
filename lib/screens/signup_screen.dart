@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:news_app/data/widgets/custom_app_bar.dart';
 import 'package:news_app/data/widgets/custom_text_field.dart';
+import 'package:news_app/helper/email_checker.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
 import 'package:news_app/util/images.dart';
 import 'package:news_app/util/styles.dart';
+import 'package:news_app/util/util.dart';
 import 'package:provider/provider.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key key}) : super(key: key);
@@ -19,12 +22,10 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final FocusNode _fullNameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
-  final FocusNode _numberFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
 
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _numberController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -36,8 +37,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _fullNameController.dispose();
-    _numberController.dispose();
+    _userNameController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
@@ -67,47 +67,64 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  _signupField("User Name", Images.user),
+                  _signupField("User Name", Images.user, _userNameController, _fullNameFocus),
                   const SizedBox(height: 15),
-                  _signupField("Phone Number", Images.user),
+                  _signupField("Email", Images.user, _emailController, _emailFocus),
                   const SizedBox(height: 15),
-                  _signupField("Email", Images.user),
+                  _signupField("Password", Images.user, _passwordController, _passwordFocus),
                   const SizedBox(height: 15),
-                  _signupField("Password", Images.user),
-                  const SizedBox(height: 15),
-                  _signupField("Confirm Password", Images.user),
+                  _signupField("Confirm Password", Images.user, _confirmPasswordController, _confirmPasswordFocus),
                   const SizedBox(height: 50),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25, vertical: Dimensions.PADDING_SIZE_SMALL),
-                    child: Container(
-                      height: 50.0,
-                      width: double.infinity,
-                      decoration: BoxDecoration(color: ColorResources.COLOR_PRIMARY_RED, borderRadius: BorderRadius.circular(25)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Register',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
+                    child: InkWell(
+                      onTap: (() async {
+                        String _email = _emailController.text.trim();
+                        String _password = _passwordController.text.trim();
+                        String _username = _userNameController.text.trim();
+                        String _passwordConfirm = _confirmPasswordController.text.trim();
+                        if (_username.isEmpty) {
+                          Util.showBotToast("Enter username", context);
+                        } else if (_password.isEmpty) {
+                          Util.showBotToast("Enter password", context);
+                        } else if (EmailChecker.isNotValid(_email)) {
+                          Util.showBotToast("Enter vaid email", context);
+                        } else if (_passwordConfirm.isEmpty) {
+                          Util.showBotToast("Enter confirm password", context);
+                        } else if (_passwordConfirm != _passwordConfirm) {
+                          Util.showBotToast("Passwords does not match", context);
+                        } else {
+                          bool isSuccess = await authProvider.addUser(_username, _password, _email);
+                          if (isSuccess) {
+                            Util.showBotToast("User registered successfully !", context, isError: false);
+                            Navigator.pop(context);
+                          } else {
+                            Util.showBotToast("Something went wrong !!", context);
+                          }
+                        }
+                      }),
+                      child: Container(
+                        height: 50.0,
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: ColorResources.COLOR_PRIMARY_RED, borderRadius: BorderRadius.circular(25)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Register',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
                               ),
-                            ),
-                            authProvider.isLoading
-                                ? const SizedBox(
-                                    height: 20.0,
-                                    width: 20.0,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 3.0,
-                                    ))
-                                : const Icon(
-                                    Icons.arrow_right_alt_rounded,
-                                    color: Colors.white,
-                                  ),
-                          ],
+                              const Icon(
+                                Icons.arrow_right_alt_rounded,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -138,9 +155,11 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  _signupField(title, image) => CustomTextField(
+  _signupField(title, image, controller, focus) => CustomTextField(
         hintText: title,
         radius: 10,
+        focusNode: focus,
+        controller: controller,
         isShowBorder: true,
         isShowPrefixIcon: true,
         prefixIconUrl: Container(

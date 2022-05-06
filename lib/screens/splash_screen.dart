@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:news_app/data/repository/auth_repo.dart';
+import 'package:news_app/data/model/user_model.dart';
+import 'package:news_app/helper/db_helper.dart';
+import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/util/images.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key key}) : super(key: key);
@@ -13,8 +14,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  SharedPreferences _prefs;
-
   @override
   void dispose() {
     super.dispose();
@@ -27,18 +26,31 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   initPrefs() async {
-    Future.delayed(const Duration(seconds: 1), () => _route());
+    Provider.of<AuthProvider>(context, listen: false).isUserLoggedIn().then((value) async {
+      if (value.isNotEmpty) {
+        User user = await DatabaseHelper.instance.readUserById(int.parse(value));
+        // User userUpdate = User(
+        //   username: user.username,
+        //   password: user.password,
+        //   email: user.email,
+        //   id: user.id,
+        //   isLoggedIn: false,
+        //   listOfArticles: "[]",
+        // );
+        // await DatabaseHelper.instance.update(userUpdate);
+        if (user != null) {
+          Provider.of<AuthProvider>(context, listen: false).saveUser(user);
+        }
+      }
+      Future.delayed(const Duration(seconds: 1), () => _route(value));
+    });
   }
 
-  void _route() {
-    AuthRepo repo = AuthRepo(dioClient: GetIt.instance(), sharedPreferences: GetIt.instance());
-    String token = repo.getUserToken();
-    if (token.isEmpty) {
-      // Navigator.of(context).pushNamedAndRemoveUntil("/Login", (route) => false);
+  void _route(String val) {
+    if (val.isNotEmpty) {
       Navigator.pushNamedAndRemoveUntil(context, "/Main", (route) => false);
     } else {
-      repo.updateToken(token);
-      // Navigator.of(context).pushNamedAndRemoveUntil("/Home", (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil("/Login", (route) => false);
     }
   }
 
