@@ -21,6 +21,7 @@ class NewsProvider with ChangeNotifier {
   int get currentPage => _currentPage;
   String get selectedCategory => _selectedCategory;
 
+  //Article lists
   List<Article> _latestNewsList = [];
   List<Article> get latestNewsList => _latestNewsList;
   List<Article> _categoryNewsList = [];

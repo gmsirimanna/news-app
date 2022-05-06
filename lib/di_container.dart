@@ -5,6 +5,7 @@ import 'package:news_app/data/repository/dio/logging_interceptor.dart';
 import 'package:news_app/data/repository/news_repo.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/providers/news_provider.dart';
+import 'package:news_app/providers/search_provider.dart';
 import 'package:news_app/util/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +21,7 @@ Future<void> init() async {
   // Provider
   sl.registerFactory(() => AuthProvider(sharedPreferences: sl()));
   sl.registerFactory(() => NewsProvider(newsRepo: sl()));
-  // sl.registerFactory(() => SearchProvider(authRepo: sl()));
+  sl.registerFactory(() => SearchProvider(newsRepo: sl()));
 
   // External
   final sharedPreferences = await SharedPreferences.getInstance();

@@ -26,26 +26,17 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   initPrefs() async {
+    // Check any user still logged in
     Provider.of<AuthProvider>(context, listen: false).isUserLoggedIn().then((value) async {
       if (value.isNotEmpty) {
         User user = await DatabaseHelper.instance.readUserById(int.parse(value));
-        // User userUpdate = User(
-        //   username: user.username,
-        //   password: user.password,
-        //   email: user.email,
-        //   id: user.id,
-        //   isLoggedIn: false,
-        //   listOfArticles: "[]",
-        // );
-        // await DatabaseHelper.instance.update(userUpdate);
-        if (user != null) {
-          Provider.of<AuthProvider>(context, listen: false).saveUser(user);
-        }
+        if (user != null) Provider.of<AuthProvider>(context, listen: false).saveUser(user);
       }
       Future.delayed(const Duration(seconds: 1), () => _route(value));
     });
   }
 
+  //Router to Main or Signup
   void _route(String val) {
     if (val.isNotEmpty) {
       Navigator.pushNamedAndRemoveUntil(context, "/Main", (route) => false);

@@ -1,8 +1,6 @@
 import 'dart:ui';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:news_app/helper/route_helper.dart';
 import 'package:news_app/providers/news_provider.dart';
 import 'package:news_app/screens/all_news_screen.dart';
@@ -40,7 +38,7 @@ class _LatestNewsWidgetState extends State<LatestNewsWidget> {
                   child: Row(
                     children: [
                       Text(
-                        "Lates News",
+                        "Latest News",
                         style: nunitoBold.copyWith(
                           fontWeight: FontWeight.w800,
                           fontSize: Dimensions.FONT_SIZE_OVER_LARGE,
@@ -69,6 +67,7 @@ class _LatestNewsWidgetState extends State<LatestNewsWidget> {
                   children: [
                     SizedBox(
                       height: 30.h,
+                      width: 100.w,
                       child: CarouselSlider.builder(
                         options: CarouselOptions(
                           autoPlay: true,
@@ -96,6 +95,7 @@ class _LatestNewsWidgetState extends State<LatestNewsWidget> {
                               children: [
                                 Container(
                                   height: double.infinity,
+                                  width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

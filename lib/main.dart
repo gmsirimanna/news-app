@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:news_app/helper/route_helper.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/providers/news_provider.dart';
+import 'package:news_app/providers/search_provider.dart';
 import 'package:provider/provider.dart';
 import 'route_generator.dart';
 import 'package:sizer/sizer.dart';
@@ -17,10 +18,11 @@ Future<void> main() async {
   );
 
   runApp(
+    //Register Providers
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => di.sl<AuthProvider>()),
       ChangeNotifierProvider(create: (context) => di.sl<NewsProvider>()),
-      // ChangeNotifierProvider(create: (context) => di.sl<SearchProvider>()),
+      ChangeNotifierProvider(create: (context) => di.sl<SearchProvider>()),
     ], child: const MyApp()),
   );
 }

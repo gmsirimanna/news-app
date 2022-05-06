@@ -1,12 +1,9 @@
-/// errors : [{"code":"l_name","message":"The last name field is required."},{"code":"password","message":"The password field is required."}]
-
 class ErrorResponse {
   List<Errors> _errors;
 
   List<Errors> get errors => _errors;
 
-  ErrorResponse({
-    List<Errors> errors}){
+  ErrorResponse({List<Errors> errors}) {
     _errors = errors;
   }
 
@@ -26,11 +23,7 @@ class ErrorResponse {
     }
     return map;
   }
-
 }
-
-/// code : "l_name"
-/// message : "The last name field is required."
 
 class Errors {
   String _code;
@@ -39,9 +32,7 @@ class Errors {
   String get code => _code;
   String get message => _message;
 
-  Errors({
-    String code,
-    String message}){
+  Errors({String code, String message}) {
     _code = code;
     _message = message;
   }
@@ -57,5 +48,4 @@ class Errors {
     map["message"] = _message;
     return map;
   }
-
 }

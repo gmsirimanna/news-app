@@ -1,11 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:news_app/data/model/artical_model.dart';
 import 'package:news_app/data/repository/exception/empty_list_indicator.dart';
 import 'package:news_app/data/repository/exception/error_indicator.dart';
-import 'package:news_app/data/widgets/custom_app_bar.dart';
+import 'package:news_app/widgets/custom_app_bar.dart';
 import 'package:news_app/providers/news_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
@@ -22,17 +20,16 @@ class AllNewsScreen extends StatefulWidget {
 
 class _AllNewsScreenState extends State<AllNewsScreen> {
   double height, width;
-  static const _pageSize = 20;
-  final PagingController<int, Article> _pagingController = PagingController(firstPageKey: 0);
+  //Paginate controller
+  final PagingController<int, Article> _pagingController = PagingController(firstPageKey: 1);
+
+  //initiate pagination
   @override
   void initState() {
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Provider.of<NewsProvider>(context, listen: false).setNextPage(1);
-    });
   }
 
   @override
@@ -41,11 +38,13 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
     super.dispose();
   }
 
+  //paginate fetch method
   Future<void> _fetchPage(int pageKey) async {
     try {
       final newsProvider = Provider.of<NewsProvider>(context, listen: false);
       await newsProvider.setNextPage(pageKey);
 
+      //check if its the last page
       final newPage = newsProvider.allNewsList;
       final isLastPage = newPage.length < 20;
       if (isLastPage) {
@@ -55,24 +54,8 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
         _pagingController.appendPage(newPage, nextPageKey);
       }
     } catch (error) {
-      // 4
       _pagingController.error = error;
     }
-  }
-
-  void setupScrollListener({@required ScrollController scrollController, Function onAtTop, Function onAtBottom}) {
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge) {
-        // Reach the top of the list
-        if (scrollController.position.pixels == 0) {
-          onAtTop?.call();
-        }
-        // Reach the bottom of the list
-        else {
-          onAtBottom?.call();
-        }
-      }
-    });
   }
 
   @override
@@ -87,12 +70,11 @@ class _AllNewsScreenState extends State<AllNewsScreen> {
       body: Consumer<NewsProvider>(builder: (context, newsProvider, child) {
         return Padding(
             padding: const EdgeInsets.symmetric(horizontal: Dimensions.PADDING_SIZE_SMALL),
+            //pull to refresh
             child: RefreshIndicator(
               onRefresh: () => Future.sync(
-                // 2
                 () => _pagingController.refresh(),
               ),
-              // 3
               child: PagedListView.separated(
                 // 4
                 builderDelegate: PagedChildBuilderDelegate<Article>(

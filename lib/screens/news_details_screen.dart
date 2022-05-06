@@ -94,7 +94,10 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                             widget.article.publishedAt != null
                                 ? Text(
                                     widget.article.publishedAt,
-                                    style: const TextStyle(color: Colors.black, fontSize: Dimensions.FONT_SIZE_DEFAULT),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: Dimensions.FONT_SIZE_DEFAULT,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   )
@@ -102,7 +105,11 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                             widget.article.title != null
                                 ? Text(
                                     widget.article.title,
-                                    style: const TextStyle(color: Colors.black, fontSize: Dimensions.FONT_SIZE_LARGE, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: Dimensions.FONT_SIZE_LARGE,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                   )
@@ -110,7 +117,11 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                             widget.article.author != null && widget.article.author.length < 30
                                 ? Text(
                                     "Published by ${widget.article.author}",
-                                    style: nunitoRegular.copyWith(color: Colors.black, fontSize: Dimensions.FONT_SIZE_DEFAULT, fontWeight: FontWeight.bold),
+                                    style: nunitoRegular.copyWith(
+                                      color: Colors.black,
+                                      fontSize: Dimensions.FONT_SIZE_DEFAULT,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   )

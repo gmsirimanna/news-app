@@ -1,44 +1,96 @@
-// import 'package:flutter/foundation.dart';
-// import 'package:tenant_click/data/model/item_model.dart';
-// import 'package:tenant_click/data/repository/auth_repo.dart';
+import 'package:flutter/foundation.dart';
+import 'package:news_app/data/model/artical_model.dart';
+import 'package:news_app/data/model/response/base/api_response.dart';
+import 'package:news_app/data/model/response/news_response.dart';
+import 'package:news_app/data/repository/news_repo.dart';
 
-// class SearchProvider with ChangeNotifier {
-//   final AuthRepo authRepo;
-//   SearchProvider({@required this.authRepo});
+class SearchProvider with ChangeNotifier {
+  final NewsRepo newsRepo;
+  SearchProvider({@required this.newsRepo});
 
-//   bool _isSearchClicked = false;
-//   final List<ProductItem> _itemList = [];
-//   List<ProductItem> _filteredItemList = [];
+  //search variables
+  int _currentPage = 1;
+  String _searchKey = '';
+  String _searchNewsErrorMessage = '';
+  List<Article> get searchNewsList => _searchNewsList;
+  List<Article> _searchNewsList = [];
+  bool _isLoadingSearchNews = false;
 
-//   bool get isSearchClicked => _isSearchClicked;
-//   List<ProductItem> get allItemList => _itemList;
-//   List<ProductItem> get filteredItemList => _filteredItemList;
+  bool _isSearchClicked = false;
+  String _selectedFilterValue = "";
+  String _selectedFilterCategory = "";
 
-//   void setSearchClicked() {
-//     _isSearchClicked = !_isSearchClicked;
-//     notifyListeners();
-//   }
+  //getters
+  int get currentPage => _currentPage;
+  String get searchKey => _searchKey;
+  String get searchNewsErrorMessage => _searchNewsErrorMessage;
+  bool get isLoadingSearchNews => _isLoadingSearchNews;
+  bool get isSearchClicked => _isSearchClicked;
+  String get selectedFilterValue => _selectedFilterValue;
+  String get selectedFilterCategory => _selectedFilterCategory;
 
-//   void setAllItems(List<ProductItem> items) {
-//     _filteredItemList.clear();
-//     _itemList.clear();
-//     _itemList.addAll(items);
-//     _filteredItemList.addAll(items);
-//     notifyListeners();
-//   }
+//Filter items according to query text category and filters
+  Future<void> filterItems() async {
+    _isLoadingSearchNews = true;
+    _searchNewsErrorMessage = '';
+    notifyListeners();
+    ApiResponse apiResponse = await newsRepo.getSearchdArticles(_searchKey, _selectedFilterCategory, _selectedFilterValue, _currentPage);
+    NewsResponse latestNewsResponse;
+    if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
+      Map map = apiResponse.response.data;
+      latestNewsResponse = NewsResponse.fromJson(map);
+      _searchNewsList = latestNewsResponse.articles;
+    } else {
+      _searchNewsList = [];
+      String errorMessage;
+      if (apiResponse.error is String) {
+        errorMessage = apiResponse.error.toString();
+      } else {
+        errorMessage = apiResponse.error.errors[0].message;
+      }
+      print(errorMessage);
+      _searchNewsErrorMessage = errorMessage;
+    }
+    _isLoadingSearchNews = false;
+    notifyListeners();
+  }
 
-//   void filterItems(String key) {
-//     _filteredItemList = _itemList
-//         .where(
-//           (item) => item.itemName.toLowerCase().contains(key.toLowerCase()),
-//         )
-//         .toList();
-//     notifyListeners();
-//   }
+  void clearSearch() {
+    _isSearchClicked = false;
+    notifyListeners();
+  }
 
-//   void clearSearch() {
-//     _filteredItemList.clear();
-//     _filteredItemList.addAll(_itemList);
-//     notifyListeners();
-//   }
-// }
+  void selectedFilter(String val) {
+    _selectedFilterValue = val;
+    notifyListeners();
+  }
+
+  void setSearchKey(String val) {
+    if (val.isNotEmpty) {
+      _searchKey = val;
+      _isSearchClicked = true;
+      filterItems();
+    } else
+      _isSearchClicked = false;
+    notifyListeners();
+  }
+
+  void selectedFilterCategoryM(String val) {
+    _selectedFilterCategory = val;
+    filterItems();
+    notifyListeners();
+  }
+
+  Future<void> setNextPage(int i) async {
+    _currentPage = i;
+    filterItems();
+    notifyListeners();
+  }
+
+  void clearFilter() {
+    _selectedFilterCategory = "";
+    _selectedFilterValue = "";
+    filterItems();
+    notifyListeners();
+  }
+}

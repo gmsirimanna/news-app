@@ -5,7 +5,7 @@ import 'package:news_app/screens/login_page.dart';
 import 'package:news_app/screens/main_screen.dart';
 import 'package:news_app/screens/news_details_screen.dart';
 import 'package:news_app/screens/signup_screen.dart';
-import 'package:news_app/screens/splash_page.dart';
+import 'package:news_app/screens/splash_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -29,7 +29,7 @@ class RouteGenerator {
                   article: item,
                 ));
       default:
-      // return MaterialPageRoute(builder: (context) => const HomePage());
+        return MaterialPageRoute(builder: (context) => const LoginPage());
     }
   }
 }

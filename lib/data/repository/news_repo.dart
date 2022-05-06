@@ -47,4 +47,19 @@ class NewsRepo {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
+
+  Future<ApiResponse> getSearchdArticles(String key, String filterCategory, String filter, int currentPage) async {
+    String uri = '${AppConstants.FILTER_ARTICLES}$key $filterCategory $filter&';
+    // if (filter.isNotEmpty) uri = uri + 'sortBy=${filter.trim().toLowerCase()}&';
+    uri = uri + 'apiKey=${AppConstants.API_KEY}&page=$currentPage&pageSize=100';
+
+    try {
+      Response response = await dioClient.get(
+        uri,
+      );
+      return ApiResponse.withSuccess(response);
+    } catch (e) {
+      return ApiResponse.withError(ApiErrorHandler.getMessage(e));
+    }
+  }
 }

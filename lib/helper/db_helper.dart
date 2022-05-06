@@ -44,14 +44,6 @@ class DatabaseHelper {
   Future<User> create(User user) async {
     final db = await instance.database;
 
-    // final json = user.toJson();
-    // final columns =
-    //     '${UserFields.title}, ${UserFields.description}, ${UserFields.time}';
-    // final values =
-    //     '${json[UserFields.title]}, ${json[UserFields.description]}, ${json[UserFields.time]}';
-    // final id = await db
-    //     .rawInsert('INSERT INTO table_name ($columns) VALUES ($values)');
-
     final id = await db.insert(tableUsers, user.toJson());
     return user.copy(id: id);
   }
@@ -65,7 +57,6 @@ class DatabaseHelper {
       where: '${UserFields.email} = ? and ${UserFields.password} = ?',
       whereArgs: [email, password],
     );
-    // final maps = await db.rawQuery('SELECT * FROM $tableUsers WHERE ${UserFields.email}=? and ${UserFields.password}=?', [email, password]);
 
     if (maps.isNotEmpty) {
       return User.fromJson(maps.first);
@@ -91,13 +82,27 @@ class DatabaseHelper {
     }
   }
 
+  Future<bool> isUserAvailable(String email) async {
+    final db = await instance.database;
+
+    final maps = await db.query(
+      tableUsers,
+      columns: UserFields.values,
+      where: '${UserFields.email} = ?',
+      whereArgs: [email],
+    );
+
+    if (maps.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<List<User>> readAllUsers() async {
     final db = await instance.database;
 
     final orderBy = '${UserFields.id} ASC';
-    // final result =
-    //     await db.rawQuery('SELECT * FROM $tableUsers ORDER BY $orderBy');
-
     final result = await db.query(tableUsers, orderBy: orderBy);
 
     return result.map((json) => User.fromJson(json)).toList();

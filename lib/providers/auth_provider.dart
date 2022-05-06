@@ -1,11 +1,9 @@
-import 'dart:ffi';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:news_app/data/model/user_model.dart';
 import 'package:news_app/helper/db_helper.dart';
-import 'package:news_app/providers/news_provider.dart';
 import 'package:news_app/util/app_constants.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -36,6 +34,15 @@ class AuthProvider with ChangeNotifier {
     return false;
   }
 
+  Future<bool> isUserAvailable(String email) async {
+    try {
+      bool isAvailable = await DatabaseHelper.instance.isUserAvailable(email);
+      return isAvailable;
+    } catch (e) {}
+    return false;
+  }
+
+  // Check user registered in database
   Future<bool> login(String username, String password) async {
     _isLoading = true;
     notifyListeners();

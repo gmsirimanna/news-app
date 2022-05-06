@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:news_app/data/widgets/custom_text_field.dart';
-import 'package:news_app/helper/email_checker.dart';
+import 'package:news_app/widgets/custom_text_field.dart';
 import 'package:news_app/helper/route_helper.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/screens/signup_screen.dart';
@@ -101,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                       Util.showBotToast("Enter email", context);
                     } else if (_password.isEmpty) {
                       Util.showBotToast("Enter password", context);
-                    } else if (EmailChecker.isNotValid(_email)) {
+                    } else if (Util.isNotValid(_email)) {
                       Util.showBotToast("Enter vaid email", context);
                     } else {
                       authProvider.login(_email, _password).then((sussess) async {
@@ -116,7 +115,10 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     height: 50.0,
                     width: width,
-                    decoration: BoxDecoration(color: ColorResources.COLOR_PRIMARY_RED, borderRadius: BorderRadius.circular(25)),
+                    decoration: BoxDecoration(
+                      color: ColorResources.COLOR_PRIMARY_RED,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -150,11 +152,17 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Text(
                         "Create an Account? ",
-                        style: nunitoRegular.copyWith(fontSize: Dimensions.FONT_SIZE_DEFAULT, color: ColorResources.COLOR_GREY),
+                        style: nunitoRegular.copyWith(
+                          fontSize: Dimensions.FONT_SIZE_DEFAULT,
+                          color: ColorResources.COLOR_GREY,
+                        ),
                       ),
                       Text(
                         "Signup",
-                        style: nunitoRegular.copyWith(fontSize: Dimensions.FONT_SIZE_DEFAULT, color: ColorResources.COLOR_SECONDARY_BLUE),
+                        style: nunitoRegular.copyWith(
+                          fontSize: Dimensions.FONT_SIZE_DEFAULT,
+                          color: ColorResources.COLOR_SECONDARY_BLUE,
+                        ),
                       ),
                     ],
                   ),

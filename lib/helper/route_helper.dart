@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/screens/login_page.dart';
@@ -16,8 +14,6 @@ class RouteHelper {
   static String getLoginRoute() => login;
   static String getRegisterRoute() => register;
 
-  // static final Handler _menuHandler = Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) => const HomePage());
-
   static final Handler _loginHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, dynamic> params) => const LoginPage(),
   );
@@ -27,7 +23,6 @@ class RouteHelper {
   );
 
   static void setupRouter() {
-    // router.define(menu, handler: _menuHandler, transitionType: TransitionType.fadeIn);
     router.define(login, handler: _loginHandler, transitionType: TransitionType.fadeIn);
     router.define(login, handler: _registerHandler, transitionType: TransitionType.fadeIn);
   }

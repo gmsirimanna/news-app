@@ -1,7 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:news_app/data/widgets/custom_app_bar.dart';
+import 'package:news_app/widgets/custom_app_bar.dart';
 import 'package:news_app/providers/news_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
@@ -9,6 +8,7 @@ import 'package:news_app/util/images.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+//Display favourite articles
 class FavouriteScreen extends StatefulWidget {
   FavouriteScreen({Key key}) : super(key: key);
 
@@ -83,6 +83,30 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                       style: const TextStyle(color: Colors.white, fontSize: Dimensions.FONT_SIZE_DEFAULT, fontWeight: FontWeight.bold),
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                            Positioned(
+                              left: 3.w,
+                              right: 3.w,
+                              top: 7.h,
+                              child: newsProvider.favouriteArtilse[currentIndex].content != null
+                                  ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          newsProvider.favouriteArtilse[currentIndex].content,
+                                          style: const TextStyle(color: Colors.white, fontSize: Dimensions.FONT_SIZE_SMALL, fontWeight: FontWeight.w400),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          "Read More..",
+                                          style: const TextStyle(color: Colors.white70, fontSize: Dimensions.FONT_SIZE_SMALL, fontWeight: FontWeight.w400),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     )
                                   : const SizedBox.shrink(),
                             ),

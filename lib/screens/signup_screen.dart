@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:news_app/data/widgets/custom_app_bar.dart';
-import 'package:news_app/data/widgets/custom_text_field.dart';
-import 'package:news_app/helper/email_checker.dart';
+import 'package:news_app/widgets/custom_app_bar.dart';
+import 'package:news_app/widgets/custom_text_field.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
@@ -10,7 +9,6 @@ import 'package:news_app/util/images.dart';
 import 'package:news_app/util/styles.dart';
 import 'package:news_app/util/util.dart';
 import 'package:provider/provider.dart';
-import 'package:bot_toast/bot_toast.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key key}) : super(key: key);
@@ -71,9 +69,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 15),
                   _signupField("Email", Images.user, _emailController, _emailFocus),
                   const SizedBox(height: 15),
-                  _signupField("Password", Images.user, _passwordController, _passwordFocus),
+                  _signupField("Password", Images.user, _passwordController, _passwordFocus, isPass: true),
                   const SizedBox(height: 15),
-                  _signupField("Confirm Password", Images.user, _confirmPasswordController, _confirmPasswordFocus),
+                  _signupField("Confirm Password", Images.user, _confirmPasswordController, _confirmPasswordFocus, isPass: true),
                   const SizedBox(height: 50),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25, vertical: Dimensions.PADDING_SIZE_SMALL),
@@ -87,12 +85,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           Util.showBotToast("Enter username", context);
                         } else if (_password.isEmpty) {
                           Util.showBotToast("Enter password", context);
-                        } else if (EmailChecker.isNotValid(_email)) {
+                        } else if (Util.isNotValid(_email)) {
                           Util.showBotToast("Enter vaid email", context);
                         } else if (_passwordConfirm.isEmpty) {
                           Util.showBotToast("Enter confirm password", context);
                         } else if (_passwordConfirm != _passwordConfirm) {
                           Util.showBotToast("Passwords does not match", context);
+                        } else if (await authProvider.isUserAvailable(_email)) {
+                          Util.showBotToast("This email already registered. Try different one.", context);
                         } else {
                           bool isSuccess = await authProvider.addUser(_username, _password, _email);
                           if (isSuccess) {
@@ -139,11 +139,17 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         Text(
                           "Already have an account? ",
-                          style: nunitoRegular.copyWith(fontSize: Dimensions.FONT_SIZE_DEFAULT, color: ColorResources.COLOR_GREY),
+                          style: nunitoRegular.copyWith(
+                            fontSize: Dimensions.FONT_SIZE_DEFAULT,
+                            color: ColorResources.COLOR_GREY,
+                          ),
                         ),
                         Text(
                           "Login",
-                          style: nunitoRegular.copyWith(fontSize: Dimensions.FONT_SIZE_DEFAULT, color: ColorResources.border_blue),
+                          style: nunitoRegular.copyWith(
+                            fontSize: Dimensions.FONT_SIZE_DEFAULT,
+                            color: ColorResources.border_blue,
+                          ),
                         ),
                       ],
                     ),
@@ -155,9 +161,10 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  _signupField(title, image, controller, focus) => CustomTextField(
+  _signupField(title, image, controller, focus, {isPass = false}) => CustomTextField(
         hintText: title,
         radius: 10,
+        isPassword: isPass,
         focusNode: focus,
         controller: controller,
         isShowBorder: true,

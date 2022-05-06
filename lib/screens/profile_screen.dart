@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/data/model/user_model.dart';
-import 'package:news_app/data/widgets/custom_app_bar.dart';
+import 'package:news_app/widgets/custom_app_bar.dart';
 import 'package:news_app/providers/auth_provider.dart';
 import 'package:news_app/util/color_resources.dart';
 import 'package:news_app/util/dimensions.dart';
