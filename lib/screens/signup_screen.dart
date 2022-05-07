@@ -89,7 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           Util.showBotToast("Enter vaid email", context);
                         } else if (_passwordConfirm.isEmpty) {
                           Util.showBotToast("Enter confirm password", context);
-                        } else if (_passwordConfirm != _passwordConfirm) {
+                        } else if (_password != _passwordConfirm) {
                           Util.showBotToast("Passwords does not match", context);
                         } else if (await authProvider.isUserAvailable(_email)) {
                           Util.showBotToast("This email already registered. Try different one.", context);
